@@ -27,16 +27,15 @@
     .step-content { display: none; }
     .step-content.active { display: block; }
     
-    /* Animación de barra de progreso de 10s */
+    /* Animación de barra de progreso reducida a 5 segundos */
     @keyframes progressAnim {
       from { width: 0%; }
       to { width: 100%; }
     }
     .animate-progress {
-      animation: progressAnim 10s linear forwards;
+      animation: progressAnim 5s linear forwards;
     }
 
-    /* Borde metálico dorado brillante */
     .gold-border {
       border: 1px solid #D4AF37;
       box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
@@ -49,14 +48,14 @@
 </head>
 <body class="bg-brand-dark text-slate-100 min-h-screen pb-12 font-sans selection:bg-brand-gold selection:text-brand-dark">
 
-  <!-- 1. PANTALLA DE PRESENTACIÓN / SPLASH SCREEN (10 SEGUNDOS) -->
+  <!-- 1. PANTALLA DE PRESENTACIÓN / SPLASH SCREEN (5 SEGUNDOS) -->
   <div id="splash-screen" class="fixed inset-0 z-50 bg-brand-dark flex flex-col items-center justify-center p-6 transition-opacity duration-700">
     <div class="relative max-w-sm w-full text-center space-y-6">
       
-      <!-- Imagen 1: Intro Circular con Banderas -->
+      <!-- Ruta corregida a assets/logo_intro.jpeg -->
       <div class="relative inline-block">
         <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500 via-amber-300 to-emerald-500 blur-lg opacity-40 animate-pulse"></div>
-        <img src="logo_intro.jpeg" alt="Cambalache Intro" class="relative rounded-full w-64 h-64 object-cover mx-auto gold-border">
+        <img src="assets/logo_intro.jpeg" alt="Cambalache Intro" class="relative rounded-full w-64 h-64 object-cover mx-auto gold-border">
       </div>
 
       <div class="space-y-2">
@@ -69,9 +68,8 @@
         <div class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full animate-progress"></div>
       </div>
 
-      <p class="text-[11px] text-slate-500 font-mono">Cargando plataforma... <span id="splash-timer">10</span>s</p>
+      <p class="text-[11px] text-slate-500 font-mono">Cargando plataforma... <span id="splash-timer">5</span>s</p>
 
-      <!-- Botón para omitir si el usuario no desea esperar los 10s completos -->
       <button onclick="closeSplash()" class="text-xs text-brand-gold hover:underline opacity-80 pt-2">
         Omitir intro ➔
       </button>
@@ -79,11 +77,11 @@
   </div>
 
 
-  <!-- 2. HEADER Y CONTENIDO PRINCIPAL DEL FORMULARIO -->
+  <!-- 2. HEADER Y CONTENIDO PRINCIPAL -->
   <header class="bg-gradient-to-b from-brand-card to-brand-dark border-b border-brand-gold/30 py-6 px-4 text-center">
     <div class="max-w-md mx-auto space-y-3">
-      <!-- Imagen 2: Banner Top del Formulario -->
-      <img src="logo_header.jpeg" alt="Cambalache Logo Header" class="w-28 h-28 object-cover rounded-full mx-auto gold-border">
+      <!-- Ruta corregida a assets/logo_header.jpeg -->
+      <img src="assets/logo_header.jpeg" alt="Cambalache Logo Header" class="w-28 h-28 object-cover rounded-full mx-auto gold-border">
       <h1 class="text-xl font-bold text-brand-gold gold-text-glow tracking-wide">VERIFICACIÓN KYC</h1>
       <p class="text-xs text-slate-300">Completa tu solicitud e ingresa tus documentos de identidad</p>
     </div>
@@ -340,8 +338,8 @@
   </main>
 
   <script>
-    // Lógica del Temporizador de Presentación (10 segundos)
-    let timeLeft = 10;
+    // Temporizador ajustado a 5 segundos
+    let timeLeft = 5;
     const timerElem = document.getElementById('splash-timer');
     
     const countdown = setInterval(() => {
@@ -361,7 +359,7 @@
       }
     }
 
-    // Lógica de Navegación del Formulario
+    // Lógica de Navegación
     let currentStep = 1;
     const totalSteps = 7;
     const titles = ["Datos personales", "Verificación de identidad", "Actividad Comercial", "Datos de Empresa", "Referencias", "Antecedentes", "Declaración y Firma"];
