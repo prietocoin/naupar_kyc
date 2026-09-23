@@ -5,48 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verificación KYC - Cambalache</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#050B14',
+              card: '#0D192D',
+              input: '#07101E',
+              gold: '#D4AF37',
+              goldHover: '#F3C63F',
+              green: '#10B981'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
     .step-content { display: none; }
     .step-content.active { display: block; }
+    
+    /* Animación de barra de progreso de 10s */
+    @keyframes progressAnim {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+    .animate-progress {
+      animation: progressAnim 10s linear forwards;
+    }
+
+    /* Borde metálico dorado brillante */
+    .gold-border {
+      border: 1px solid #D4AF37;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+    }
+    
+    .gold-text-glow {
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+<body class="bg-brand-dark text-slate-100 min-h-screen pb-12 font-sans selection:bg-brand-gold selection:text-brand-dark">
 
-  <!-- Header / Banner -->
-  <header class="bg-slate-800 border-b border-slate-700 py-6 px-4 text-center">
-    <h1 class="text-2xl font-bold text-amber-400">FORMULARIO KYC</h1>
-    <p class="text-sm text-slate-400 mt-1">Completa tu solicitud e ingresa tus documentos de identidad</p>
+  <!-- 1. PANTALLA DE PRESENTACIÓN / SPLASH SCREEN (10 SEGUNDOS) -->
+  <div id="splash-screen" class="fixed inset-0 z-50 bg-brand-dark flex flex-col items-center justify-center p-6 transition-opacity duration-700">
+    <div class="relative max-w-sm w-full text-center space-y-6">
+      
+      <!-- Imagen 1: Intro Circular con Banderas -->
+      <div class="relative inline-block">
+        <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500 via-amber-300 to-emerald-500 blur-lg opacity-40 animate-pulse"></div>
+        <img src="logo_intro.jpeg" alt="Cambalache Intro" class="relative rounded-full w-64 h-64 object-cover mx-auto gold-border">
+      </div>
+
+      <div class="space-y-2">
+        <h1 class="text-2xl font-extrabold text-brand-gold tracking-wider gold-text-glow">CAMBALACHE</h1>
+        <p class="text-xs text-slate-400">Sistema Global de Verificación de Identidad (KYC)</p>
+      </div>
+
+      <!-- Barra de Carga -->
+      <div class="w-full bg-slate-900 rounded-full h-2 border border-brand-gold/30 overflow-hidden">
+        <div class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full animate-progress"></div>
+      </div>
+
+      <p class="text-[11px] text-slate-500 font-mono">Cargando plataforma... <span id="splash-timer">10</span>s</p>
+
+      <!-- Botón para omitir si el usuario no desea esperar los 10s completos -->
+      <button onclick="closeSplash()" class="text-xs text-brand-gold hover:underline opacity-80 pt-2">
+        Omitir intro ➔
+      </button>
+    </div>
+  </div>
+
+
+  <!-- 2. HEADER Y CONTENIDO PRINCIPAL DEL FORMULARIO -->
+  <header class="bg-gradient-to-b from-brand-card to-brand-dark border-b border-brand-gold/30 py-6 px-4 text-center">
+    <div class="max-w-md mx-auto space-y-3">
+      <!-- Imagen 2: Banner Top del Formulario -->
+      <img src="logo_header.jpeg" alt="Cambalache Logo Header" class="w-28 h-28 object-cover rounded-full mx-auto gold-border">
+      <h1 class="text-xl font-bold text-brand-gold gold-text-glow tracking-wide">VERIFICACIÓN KYC</h1>
+      <p class="text-xs text-slate-300">Completa tu solicitud e ingresa tus documentos de identidad</p>
+    </div>
   </header>
 
   <main class="max-w-2xl mx-auto mt-6 px-4">
     <!-- Indicador de Pasos -->
-    <div class="flex justify-between items-center mb-6 text-xs text-slate-400">
-      <span>Paso <span id="current-step-num">1</span> de 7</span>
-      <span id="step-title" class="font-semibold text-amber-400">Datos personales</span>
+    <div class="flex justify-between items-center mb-4 text-xs text-slate-400 bg-brand-card p-3 rounded-lg border border-slate-800">
+      <span class="font-mono">Paso <span id="current-step-num" class="text-brand-gold font-bold">1</span> de 7</span>
+      <span id="step-title" class="font-semibold text-brand-gold">Datos personales</span>
     </div>
 
     <!-- Formulario Multi-paso -->
-    <form id="kyc-form" class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl space-y-6">
+    <form id="kyc-form" class="bg-brand-card p-6 rounded-2xl gold-border shadow-2xl space-y-6">
 
       <!-- PASO 1: Datos Personales -->
       <div id="step-1" class="step-content active space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">1. Datos Personales</h2>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold flex items-center gap-2">
+          <span>1.</span> Datos Personales
+        </h2>
         
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs mb-1">Nombres *</label>
-            <input type="text" name="nombres" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Nombres *</label>
+            <input type="text" name="nombres" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs mb-1">Apellidos *</label>
-            <input type="text" name="apellidos" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Apellidos *</label>
+            <input type="text" name="apellidos" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs mb-1">Tipo de documento *</label>
-            <select name="tipo_documento" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Tipo de documento *</label>
+            <select name="tipo_documento" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
               <option value="">Seleccione...</option>
               <option value="DNI">DNI / Cédula</option>
               <option value="Pasaporte">Pasaporte</option>
@@ -54,102 +127,102 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs mb-1">Número de documento *</label>
-            <input type="text" name="numero_documento" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Número de documento *</label>
+            <input type="text" name="numero_documento" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs mb-1">Nacionalidad *</label>
-            <input type="text" name="nacionalidad" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Nacionalidad *</label>
+            <input type="text" name="nacionalidad" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs mb-1">Fecha de nacimiento *</label>
-            <input type="date" name="fecha_nacimiento" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Fecha de nacimiento *</label>
+            <input type="date" name="fecha_nacimiento" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs mb-1">País de residencia *</label>
-            <input type="text" name="pais_residencia" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">País de residencia *</label>
+            <input type="text" name="pais_residencia" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs mb-1">Ciudad de residencia *</label>
-            <input type="text" name="ciudad_residencia" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Ciudad de residencia *</label>
+            <input type="text" name="ciudad_residencia" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Dirección actual *</label>
-          <textarea name="direccion_actual" required rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm"></textarea>
+          <label class="block text-xs mb-1 text-slate-300">Dirección actual *</label>
+          <textarea name="direccion_actual" required rows="2" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs mb-1">WhatsApp Principal *</label>
-            <input type="tel" name="whatsapp_principal" placeholder="+58 412..." required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">WhatsApp Principal *</label>
+            <input type="tel" name="whatsapp_principal" placeholder="+58 412..." required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs mb-1">Segundo Contacto</label>
-            <input type="tel" name="whatsapp_secundario" placeholder="+58 414..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Segundo Contacto</label>
+            <input type="tel" name="whatsapp_secundario" placeholder="+58 414..." class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Correo Electrónico *</label>
-          <input type="email" name="email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Correo Electrónico *</label>
+          <input type="email" name="email" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Redes sociales o perfil comercial</label>
-          <input type="text" name="redes_sociales" placeholder="@usuario o link" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Redes sociales o perfil comercial</label>
+          <input type="text" name="redes_sociales" placeholder="@usuario o link" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
         </div>
       </div>
 
       <!-- PASO 2: Verificación de Identidad -->
       <div id="step-2" class="step-content space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">2. Verificación de Identidad</h2>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">2. Verificación de Identidad</h2>
         
         <div>
-          <label class="block text-xs mb-1">Foto Documento (Frente) *</label>
-          <input type="file" name="doc_frente" accept="image/*" capture="environment" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Foto Documento (Frente) *</label>
+          <input type="file" name="doc_frente" accept="image/*" capture="environment" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Foto Documento (Reverso) *</label>
-          <input type="file" name="doc_dorso" accept="image/*" capture="environment" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Foto Documento (Reverso) *</label>
+          <input type="file" name="doc_dorso" accept="image/*" capture="environment" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Selfie con el documento *</label>
-          <input type="file" name="selfie" accept="image/*" capture="user" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Selfie con el documento *</label>
+          <input type="file" name="selfie" accept="image/*" capture="user" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Comprobante de Domicilio *</label>
-          <input type="file" name="domicilio" accept="image/*,.pdf" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Comprobante de Domicilio *</label>
+          <input type="file" name="domicilio" accept="image/*,.pdf" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
       </div>
 
       <!-- PASO 3: Actividad Comercial -->
       <div id="step-3" class="step-content space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">3. Actividad Comercial</h2>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">3. Actividad Comercial</h2>
         
         <div>
-          <label class="block text-xs mb-1">Tiempo trabajando en remesas/cambio *</label>
-          <input type="text" name="tiempo_experiencia" placeholder="Ej. 2 años" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Tiempo trabajando en remesas/cambio *</label>
+          <input type="text" name="tiempo_experiencia" placeholder="Ej. 2 años" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Nombre Comercial</label>
-          <input type="text" name="nombre_comercial" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Nombre Comercial</label>
+          <input type="text" name="nombre_comercial" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Tipo de Operación *</label>
-          <select name="tipo_operacion" id="tipo_operacion" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Tipo de Operación *</label>
+          <select name="tipo_operacion" id="tipo_operacion" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
             <option value="Persona natural">Persona Natural</option>
             <option value="Empresa">Empresa</option>
           </select>
@@ -157,12 +230,12 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs mb-1">Volumen aprox. diario</label>
-            <input type="text" name="volumen_diario" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Volumen aprox. diario</label>
+            <input type="text" name="volumen_diario" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
           </div>
           <div>
-            <label class="block text-xs mb-1">Capital de trabajo *</label>
-            <select name="capital_trabajo" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <label class="block text-xs mb-1 text-slate-300">Capital de trabajo *</label>
+            <select name="capital_trabajo" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
               <option value="Menos de $500">Menos de $500</option>
               <option value="$500 a $1.000">$500 a $1.000</option>
               <option value="$1.001 a $3.000">$1.001 a $3.000</option>
@@ -174,59 +247,59 @@
         </div>
       </div>
 
-      <!-- PASO 4: Datos de Empresa (Opcional) -->
+      <!-- PASO 4: Datos de Empresa -->
       <div id="step-4" class="step-content space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">4. Datos de Empresa</h2>
-        <p class="text-xs text-slate-400 mb-2">Completar solo si seleccionaste tipo de operación "Empresa".</p>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">4. Datos de Empresa</h2>
+        <p class="text-xs text-slate-400">Completar solo si seleccionaste "Empresa".</p>
         
         <div>
-          <label class="block text-xs mb-1">Razón Social</label>
-          <input type="text" name="empresa_razon_social" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Razón Social</label>
+          <input type="text" name="empresa_razon_social" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">RUT / RIF / EIN / Registro Fiscal</label>
-          <input type="text" name="empresa_registro_fiscal" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">RUT / RIF / EIN / Registro Fiscal</label>
+          <input type="text" name="empresa_registro_fiscal" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
         </div>
 
         <div>
-          <label class="block text-xs mb-1">Documento Acreditación Empresa</label>
-          <input type="file" name="doc_empresa" accept="image/*,.pdf" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">Documento Acreditación Empresa</label>
+          <input type="file" name="doc_empresa" accept="image/*,.pdf" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
       </div>
 
       <!-- PASO 5: Referencias -->
       <div id="step-5" class="step-content space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">5. Referencias Comerciales</h2>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">5. Referencias Comerciales</h2>
         
-        <div class="p-3 bg-slate-900/50 rounded border border-slate-700 space-y-2">
-          <p class="text-xs font-semibold text-amber-400">Referencia 1</p>
-          <input type="text" id="ref1_nombre" placeholder="Nombre completo *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
-          <input type="tel" id="ref1_whatsapp" placeholder="WhatsApp *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        <div class="p-3 bg-brand-input rounded-xl border border-slate-800 space-y-2">
+          <p class="text-xs font-semibold text-brand-gold">Referencia 1</p>
+          <input type="text" id="ref1_nombre" placeholder="Nombre completo *" class="w-full bg-brand-dark border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+          <input type="tel" id="ref1_whatsapp" placeholder="WhatsApp *" class="w-full bg-brand-dark border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
 
-        <div class="p-3 bg-slate-900/50 rounded border border-slate-700 space-y-2">
-          <p class="text-xs font-semibold text-amber-400">Referencia 2</p>
-          <input type="text" id="ref2_nombre" placeholder="Nombre completo *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
-          <input type="tel" id="ref2_whatsapp" placeholder="WhatsApp *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        <div class="p-3 bg-brand-input rounded-xl border border-slate-800 space-y-2">
+          <p class="text-xs font-semibold text-brand-gold">Referencia 2</p>
+          <input type="text" id="ref2_nombre" placeholder="Nombre completo *" class="w-full bg-brand-dark border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+          <input type="tel" id="ref2_whatsapp" placeholder="WhatsApp *" class="w-full bg-brand-dark border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
         </div>
       </div>
 
       <!-- PASO 6: Antecedentes -->
       <div id="step-6" class="step-content space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">6. Antecedentes</h2>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">6. Antecedentes</h2>
         
         <div>
-          <label class="block text-xs mb-1">¿Ha tenido disputas o reclamos con colegas?</label>
-          <select id="ant_disputas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">¿Ha tenido disputas o reclamos con colegas?</label>
+          <select id="ant_disputas" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
             <option value="No">No</option>
             <option value="Sí">Sí</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-xs mb-1">¿Mantiene deudas pendientes con colegas o clientes?</label>
-          <select id="ant_deudas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <label class="block text-xs mb-1 text-slate-300">¿Mantiene deudas pendientes con colegas o clientes?</label>
+          <select id="ant_deudas" class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
             <option value="No">No</option>
             <option value="Sí">Sí</option>
           </select>
@@ -235,38 +308,60 @@
 
       <!-- PASO 7: Declaración y Firma -->
       <div id="step-7" class="step-content space-y-4">
-        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">7. Declaración y Firma</h2>
+        <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">7. Declaración y Firma</h2>
         
-        <label class="flex items-start gap-2 text-xs">
-          <input type="checkbox" id="aceptacion" required class="mt-1">
+        <label class="flex items-start gap-2 text-xs text-slate-300">
+          <input type="checkbox" id="aceptacion" required class="mt-1 accent-brand-gold">
           <span>Acepto la declaración y autorizo la verificación de mis datos.</span>
         </label>
 
-        <div>
-          <label class="block text-xs mb-2">Firma digital *</label>
-          <canvas id="signature-pad" width="300" height="150" class="bg-white rounded border border-slate-600 touch-none mx-auto block"></canvas>
-          <button type="button" id="clear-signature" class="text-xs text-amber-400 mt-2 underline block mx-auto">Limpiar firma</button>
+        <div class="text-center">
+          <label class="block text-xs mb-2 text-slate-300">Firma digital *</label>
+          <canvas id="signature-pad" width="300" height="150" class="bg-white rounded-xl border-2 border-brand-gold/50 touch-none mx-auto block"></canvas>
+          <button type="button" id="clear-signature" class="text-xs text-brand-gold mt-2 underline inline-block">Limpiar firma</button>
         </div>
       </div>
 
       <!-- Botones de Navegación -->
-      <div class="flex justify-between mt-6 pt-4 border-t border-slate-700">
-        <button type="button" id="btn-prev" class="px-4 py-2 bg-slate-700 rounded text-sm hidden">Anterior</button>
-        <button type="button" id="btn-next" class="px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded text-sm ml-auto">Siguiente</button>
-        <button type="submit" id="btn-submit" class="px-4 py-2 bg-emerald-500 text-slate-900 font-bold rounded text-sm ml-auto hidden">Enviar Solicitud</button>
+      <div class="flex justify-between mt-6 pt-4 border-t border-slate-800">
+        <button type="button" id="btn-prev" class="px-5 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-xl text-xs font-semibold hidden">Anterior</button>
+        <button type="button" id="btn-next" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-brand-dark font-bold rounded-xl text-xs shadow-lg ml-auto transition">Siguiente</button>
+        <button type="submit" id="btn-submit" class="px-5 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-brand-dark font-bold rounded-xl text-xs shadow-lg ml-auto hidden transition">Enviar Solicitud</button>
       </div>
 
     </form>
 
     <!-- Pantalla de Éxito -->
-    <div id="success-screen" class="hidden bg-slate-800 p-8 rounded-xl text-center border border-emerald-500/50 mt-6">
-      <div class="text-4xl mb-3">✅</div>
-      <h2 class="text-xl font-bold text-emerald-400">¡Registro Exitoso!</h2>
-      <p class="text-sm text-slate-300 mt-2">Tus datos y documentos han sido enviados correctamente para la verificación KYC.</p>
+    <div id="success-screen" class="hidden bg-brand-card p-8 rounded-2xl text-center gold-border mt-6">
+      <div class="text-5xl mb-3">✅</div>
+      <h2 class="text-xl font-bold text-brand-green">¡Registro Exitoso!</h2>
+      <p class="text-xs text-slate-300 mt-2">Tus datos y documentos han sido enviados correctamente a Cambalache para la verificación KYC.</p>
     </div>
   </main>
 
   <script>
+    // Lógica del Temporizador de Presentación (10 segundos)
+    let timeLeft = 10;
+    const timerElem = document.getElementById('splash-timer');
+    
+    const countdown = setInterval(() => {
+      timeLeft--;
+      if (timerElem) timerElem.innerText = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        closeSplash();
+      }
+    }, 1000);
+
+    function closeSplash() {
+      const splash = document.getElementById('splash-screen');
+      if (splash) {
+        splash.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => splash.remove(), 700);
+      }
+    }
+
+    // Lógica de Navegación del Formulario
     let currentStep = 1;
     const totalSteps = 7;
     const titles = ["Datos personales", "Verificación de identidad", "Actividad Comercial", "Datos de Empresa", "Referencias", "Antecedentes", "Declaración y Firma"];
@@ -291,7 +386,6 @@
     canvas.addEventListener('touchend', () => isDrawing = false);
     document.getElementById('clear-signature').addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
 
-    // Control de Pasos
     function updateStep() {
       document.querySelectorAll('.step-content').forEach((el, idx) => {
         el.classList.toggle('active', idx + 1 === currentStep);
@@ -318,7 +412,6 @@
       
       const formData = new FormData(e.target);
 
-      // Agregar estructuras JSON compuestas
       formData.append('paises_opera', JSON.stringify(["Global"]));
       formData.append('monedas_opera', JSON.stringify(["USD", "USDT"]));
       formData.append('medios_trabajo', JSON.stringify(["Zelle", "Binance"]));
@@ -333,7 +426,6 @@
         deudas: document.getElementById('ant_deudas').value
       }));
 
-      // Convertir Firma Canvas a archivo de imagen
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
       formData.append('firma', blob, 'firma.png');
 
