@@ -1,1 +1,356 @@
-.
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación KYC - Cambalache</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+
+  <!-- Header / Banner -->
+  <header class="bg-slate-800 border-b border-slate-700 py-6 px-4 text-center">
+    <h1 class="text-2xl font-bold text-amber-400">FORMULARIO KYC</h1>
+    <p class="text-sm text-slate-400 mt-1">Completa tu solicitud e ingresa tus documentos de identidad</p>
+  </header>
+
+  <main class="max-w-2xl mx-auto mt-6 px-4">
+    <!-- Indicador de Pasos -->
+    <div class="flex justify-between items-center mb-6 text-xs text-slate-400">
+      <span>Paso <span id="current-step-num">1</span> de 7</span>
+      <span id="step-title" class="font-semibold text-amber-400">Datos personales</span>
+    </div>
+
+    <!-- Formulario Multi-paso -->
+    <form id="kyc-form" class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl space-y-6">
+
+      <!-- PASO 1: Datos Personales -->
+      <div id="step-1" class="step-content active space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">1. Datos Personales</h2>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Nombres *</label>
+            <input type="text" name="nombres" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Apellidos *</label>
+            <input type="text" name="apellidos" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Tipo de documento *</label>
+            <select name="tipo_documento" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+              <option value="">Seleccione...</option>
+              <option value="DNI">DNI / Cédula</option>
+              <option value="Pasaporte">Pasaporte</option>
+              <option value="Licencia">Licencia de Conducir</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Número de documento *</label>
+            <input type="text" name="numero_documento" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Nacionalidad *</label>
+            <input type="text" name="nacionalidad" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Fecha de nacimiento *</label>
+            <input type="date" name="fecha_nacimiento" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">País de residencia *</label>
+            <input type="text" name="pais_residencia" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Ciudad de residencia *</label>
+            <input type="text" name="ciudad_residencia" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Dirección actual *</label>
+          <textarea name="direccion_actual" required rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">WhatsApp Principal *</label>
+            <input type="tel" name="whatsapp_principal" placeholder="+58 412..." required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Segundo Contacto</label>
+            <input type="tel" name="whatsapp_secundario" placeholder="+58 414..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Correo Electrónico *</label>
+          <input type="email" name="email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Redes sociales o perfil comercial</label>
+          <input type="text" name="redes_sociales" placeholder="@usuario o link" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+      </div>
+
+      <!-- PASO 2: Verificación de Identidad -->
+      <div id="step-2" class="step-content space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">2. Verificación de Identidad</h2>
+        
+        <div>
+          <label class="block text-xs mb-1">Foto Documento (Frente) *</label>
+          <input type="file" name="doc_frente" accept="image/*" capture="environment" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Foto Documento (Reverso) *</label>
+          <input type="file" name="doc_dorso" accept="image/*" capture="environment" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Selfie con el documento *</label>
+          <input type="file" name="selfie" accept="image/*" capture="user" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Comprobante de Domicilio *</label>
+          <input type="file" name="domicilio" accept="image/*,.pdf" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+      </div>
+
+      <!-- PASO 3: Actividad Comercial -->
+      <div id="step-3" class="step-content space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">3. Actividad Comercial</h2>
+        
+        <div>
+          <label class="block text-xs mb-1">Tiempo trabajando en remesas/cambio *</label>
+          <input type="text" name="tiempo_experiencia" placeholder="Ej. 2 años" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Nombre Comercial</label>
+          <input type="text" name="nombre_comercial" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Tipo de Operación *</label>
+          <select name="tipo_operacion" id="tipo_operacion" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <option value="Persona natural">Persona Natural</option>
+            <option value="Empresa">Empresa</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Volumen aprox. diario</label>
+            <input type="text" name="volumen_diario" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Capital de trabajo *</label>
+            <select name="capital_trabajo" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+              <option value="Menos de $500">Menos de $500</option>
+              <option value="$500 a $1.000">$500 a $1.000</option>
+              <option value="$1.001 a $3.000">$1.001 a $3.000</option>
+              <option value="$3.001 a $5.000">$3.001 a $5.000</option>
+              <option value="$5.001 a $10.000">$5.001 a $10.000</option>
+              <option value="Más de $10.000">Más de $10.000</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 4: Datos de Empresa (Opcional) -->
+      <div id="step-4" class="step-content space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">4. Datos de Empresa</h2>
+        <p class="text-xs text-slate-400 mb-2">Completar solo si seleccionaste tipo de operación "Empresa".</p>
+        
+        <div>
+          <label class="block text-xs mb-1">Razón Social</label>
+          <input type="text" name="empresa_razon_social" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">RUT / RIF / EIN / Registro Fiscal</label>
+          <input type="text" name="empresa_registro_fiscal" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Documento Acreditación Empresa</label>
+          <input type="file" name="doc_empresa" accept="image/*,.pdf" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+      </div>
+
+      <!-- PASO 5: Referencias -->
+      <div id="step-5" class="step-content space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">5. Referencias Comerciales</h2>
+        
+        <div class="p-3 bg-slate-900/50 rounded border border-slate-700 space-y-2">
+          <p class="text-xs font-semibold text-amber-400">Referencia 1</p>
+          <input type="text" id="ref1_nombre" placeholder="Nombre completo *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <input type="tel" id="ref1_whatsapp" placeholder="WhatsApp *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+
+        <div class="p-3 bg-slate-900/50 rounded border border-slate-700 space-y-2">
+          <p class="text-xs font-semibold text-amber-400">Referencia 2</p>
+          <input type="text" id="ref2_nombre" placeholder="Nombre completo *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <input type="tel" id="ref2_whatsapp" placeholder="WhatsApp *" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+        </div>
+      </div>
+
+      <!-- PASO 6: Antecedentes -->
+      <div id="step-6" class="step-content space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">6. Antecedentes</h2>
+        
+        <div>
+          <label class="block text-xs mb-1">¿Ha tenido disputas o reclamos con colegas?</label>
+          <select id="ant_disputas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">¿Mantiene deudas pendientes con colegas o clientes?</label>
+          <select id="ant_deudas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PASO 7: Declaración y Firma -->
+      <div id="step-7" class="step-content space-y-4">
+        <h2 class="text-lg font-bold border-b border-slate-700 pb-2 text-amber-400">7. Declaración y Firma</h2>
+        
+        <label class="flex items-start gap-2 text-xs">
+          <input type="checkbox" id="aceptacion" required class="mt-1">
+          <span>Acepto la declaración y autorizo la verificación de mis datos.</span>
+        </label>
+
+        <div>
+          <label class="block text-xs mb-2">Firma digital *</label>
+          <canvas id="signature-pad" width="300" height="150" class="bg-white rounded border border-slate-600 touch-none mx-auto block"></canvas>
+          <button type="button" id="clear-signature" class="text-xs text-amber-400 mt-2 underline block mx-auto">Limpiar firma</button>
+        </div>
+      </div>
+
+      <!-- Botones de Navegación -->
+      <div class="flex justify-between mt-6 pt-4 border-t border-slate-700">
+        <button type="button" id="btn-prev" class="px-4 py-2 bg-slate-700 rounded text-sm hidden">Anterior</button>
+        <button type="button" id="btn-next" class="px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded text-sm ml-auto">Siguiente</button>
+        <button type="submit" id="btn-submit" class="px-4 py-2 bg-emerald-500 text-slate-900 font-bold rounded text-sm ml-auto hidden">Enviar Solicitud</button>
+      </div>
+
+    </form>
+
+    <!-- Pantalla de Éxito -->
+    <div id="success-screen" class="hidden bg-slate-800 p-8 rounded-xl text-center border border-emerald-500/50 mt-6">
+      <div class="text-4xl mb-3">✅</div>
+      <h2 class="text-xl font-bold text-emerald-400">¡Registro Exitoso!</h2>
+      <p class="text-sm text-slate-300 mt-2">Tus datos y documentos han sido enviados correctamente para la verificación KYC.</p>
+    </div>
+  </main>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 7;
+    const titles = ["Datos personales", "Verificación de identidad", "Actividad Comercial", "Datos de Empresa", "Referencias", "Antecedentes", "Declaración y Firma"];
+
+    // Canvas de Firma
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); });
+    canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); } });
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('touchstart', (e) => { isDrawing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { if (isDrawing) { const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); } e.preventDefault(); });
+    canvas.addEventListener('touchend', () => isDrawing = false);
+    document.getElementById('clear-signature').addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+
+    // Control de Pasos
+    function updateStep() {
+      document.querySelectorAll('.step-content').forEach((el, idx) => {
+        el.classList.toggle('active', idx + 1 === currentStep);
+      });
+      document.getElementById('current-step-num').innerText = currentStep;
+      document.getElementById('step-title').innerText = titles[currentStep - 1];
+
+      document.getElementById('btn-prev').classList.toggle('hidden', currentStep === 1);
+      if (currentStep === totalSteps) {
+        document.getElementById('btn-next').classList.add('hidden');
+        document.getElementById('btn-submit').classList.remove('hidden');
+      } else {
+        document.getElementById('btn-next').classList.remove('hidden');
+        document.getElementById('btn-submit').classList.add('hidden');
+      }
+    }
+
+    document.getElementById('btn-next').addEventListener('click', () => { if (currentStep < totalSteps) { currentStep++; updateStep(); } });
+    document.getElementById('btn-prev').addEventListener('click', () => { if (currentStep > 1) { currentStep--; updateStep(); } });
+
+    // Submit del Formulario
+    document.getElementById('kyc-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+
+      // Agregar estructuras JSON compuestas
+      formData.append('paises_opera', JSON.stringify(["Global"]));
+      formData.append('monedas_opera', JSON.stringify(["USD", "USDT"]));
+      formData.append('medios_trabajo', JSON.stringify(["Zelle", "Binance"]));
+      
+      formData.append('referencias', JSON.stringify([
+        { nombre: document.getElementById('ref1_nombre').value, whatsapp: document.getElementById('ref1_whatsapp').value },
+        { nombre: document.getElementById('ref2_nombre').value, whatsapp: document.getElementById('ref2_whatsapp').value }
+      ]));
+
+      formData.append('antecedentes', JSON.stringify({
+        disputas: document.getElementById('ant_disputas').value,
+        deudas: document.getElementById('ant_deudas').value
+      }));
+
+      // Convertir Firma Canvas a archivo de imagen
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      formData.append('firma', blob, 'firma.png');
+
+      try {
+        const res = await fetch('/api/kyc', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('kyc-form').classList.add('hidden');
+          document.getElementById('success-screen').classList.remove('hidden');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Error conectando con el servidor.');
+      }
+    });
+  </script>
+</body>
+</html>
