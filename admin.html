@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - KYC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <!-- 1. Pantalla de Login Admin -->
+  <div id="login-view" class="flex items-center justify-center min-h-screen px-4">
+    <div class="bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl w-full max-w-md space-y-6">
+      <div class="text-center">
+        <h1 class="text-2xl font-bold text-amber-400">Panel Superusuario</h1>
+        <p class="text-xs text-slate-400 mt-1">Ingresa tus credenciales para gestionar el KYC</p>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs mb-1">Correo Electrónico</label>
+          <input type="email" id="admin-email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-xs mb-1">Contraseña</label>
+          <input type="password" id="admin-pass" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-amber-400">
+        </div>
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded text-sm transition">
+          Iniciar Sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Dashboard de Administración -->
+  <div id="dashboard-view" class="hidden">
+    <!-- Navbar -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <h1 class="text-xl font-bold text-amber-400">Gestión de Solicitudes KYC</h1>
+        <span id="badge-total" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0 registros</span>
+      </div>
+      <button id="btn-logout" class="text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <!-- Tabla de Solicitudes -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/80 text-amber-400 uppercase font-semibold border-b border-slate-700">
+              <tr>
+                <th class="p-3">#ID</th>
+                <th class="p-3">Cliente</th>
+                <th class="p-3">Documento</th>
+                <th class="p-3">WhatsApp</th>
+                <th class="p-3">Operación</th>
+                <th class="p-3">Estado</th>
+                <th class="p-3 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="table-body" class="divide-y divide-slate-700/50">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 3. Modal de Detalle de Solicitud -->
+  <div id="modal-detail" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 space-y-6 text-xs">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h2 class="text-lg font-bold text-amber-400">Expediente de Verificación #<span id="modal-id"></span></h2>
+        <button id="close-modal" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div id="modal-content" class="space-y-4">
+        <!-- Detalle cargado por JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const R2_PUBLIC_DOMAIN = ''; // Tu dominio R2 si lo usas directamente
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-pass').value;
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('admin_logged', 'true');
+          showDashboard();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Error conectando con el servidor');
+      }
+    });
+
+    // Mostrar Dashboard y Cargar Datos
+    function showDashboard() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('dashboard-view').classList.remove('hidden');
+      loadSolicitudes();
+    }
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.removeItem('admin_logged');
+      location.reload();
+    });
+
+    // Cargar solicitudes desde el Backend
+    async function loadSolicitudes() {
+      try {
+        const res = await fetch('/api/admin/solicitudes');
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        document.getElementById('badge-total').innerText = `${data.total} registros`;
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+
+        data.solicitudes.forEach(sol => {
+          const badgeClass = sol.estado === 'aprobado' 
+            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+            : sol.estado === 'rechazado' 
+            ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' 
+            : 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-slate-700/30 transition';
+          row.innerHTML = `
+            <td class="p-3 font-mono">#${sol.id}</td>
+            <td class="p-3 font-semibold text-slate-100">${sol.nombres} ${sol.apellidos}</td>
+            <td class="p-3">${sol.tipo_documento}: ${sol.numero_documento}</td>
+            <td class="p-3">${sol.whatsapp_principal || '-'}</td>
+            <td class="p-3">${sol.tipo_operacion}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 border rounded-full text-[10px] uppercase font-bold ${badgeClass}">
+                ${sol.estado}
+              </span>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick='viewDetail(${JSON.stringify(sol)})' class="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-amber-400">Ver</button>
+              <button onclick="updateStatus(${sol.id}, 'aprobado')" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded">✓</button>
+              <button onclick="updateStatus(${sol.id}, 'rechazado')" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded">✕</button>
+              <button onclick="deleteSolicitud(${sol.id})" class="px-2 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded">🗑</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Cambiar estado (Aprobar/Rechazar)
+    async function updateStatus(id, estado) {
+      if (!confirm(`¿Deseas cambiar el estado de la solicitud #${id} a '${estado.toUpperCase()}'?`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/solicitudes/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estado })
+        });
+        const data = await res.json();
+        if (data.success) loadSolicitudes();
+      } catch (err) {
+        alert('Error al actualizar el estado');
+      }
+    }
+
+    // Eliminar registro y archivos de R2
+    async function deleteSolicitud(id) {
+      if (!confirm(`⚠️ ¿Deseas ELIMINAR PERMANENTEMENTE la solicitud #${id} y sus archivos en R2?`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/solicitudes/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) loadSolicitudes();
+      } catch (err) {
+        alert('Error al eliminar el registro');
+      }
+    }
+
+    // Modal de Detalle
+    function viewDetail(sol) {
+      document.getElementById('modal-id').innerText = sol.id;
+      const content = document.getElementById('modal-content');
+
+      content.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 bg-slate-900/50 p-3 rounded border border-slate-700">
+          <div><strong class="text-slate-400">Nacionalidad:</strong> ${sol.nacionalidad}</div>
+          <div><strong class="text-slate-400">F. Nacimiento:</strong> ${sol.fecha_nacimiento}</div>
+          <div><strong class="text-slate-400">Residencia:</strong> ${sol.ciudad_residencia}, ${sol.pais_residencia}</div>
+          <div><strong class="text-slate-400">Email:</strong> ${sol.email}</div>
+          <div class="col-span-2"><strong class="text-slate-400">Dirección:</strong> ${sol.direccion_actual}</div>
+        </div>
+
+        <h3 class="font-bold text-amber-400 mt-4">Documentos y Fotos R2</h3>
+        <div class="grid grid-cols-2 gap-2 text-center">
+          <div class="p-2 border border-slate-700 rounded bg-slate-900">
+            <p class="text-[10px] text-slate-400 mb-1">Doc Frente</p>
+            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_doc_frente_key}</p>
+          </div>
+          <div class="p-2 border border-slate-700 rounded bg-slate-900">
+            <p class="text-[10px] text-slate-400 mb-1">Doc Dorso</p>
+            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_doc_dorso_key}</p>
+          </div>
+          <div class="p-2 border border-slate-700 rounded bg-slate-900">
+            <p class="text-[10px] text-slate-400 mb-1">Selfie</p>
+            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_doc_selfie_key}</p>
+          </div>
+          <div class="p-2 border border-slate-700 rounded bg-slate-900">
+            <p class="text-[10px] text-slate-400 mb-1">Firma Key</p>
+            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_firma_key}</p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modal-detail').classList.remove('hidden');
+    }
+
+    document.getElementById('close-modal').addEventListener('click', () => {
+      document.getElementById('modal-detail').classList.add('hidden');
+    });
+
+    // Auto-login si ya inició sesión
+    if (localStorage.getItem('admin_logged') === 'true') {
+      showDashboard();
+    }
+  </script>
+</body>
+</html>
