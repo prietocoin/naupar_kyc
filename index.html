@@ -52,7 +52,6 @@
   <div id="splash-screen" class="fixed inset-0 z-50 bg-brand-dark flex flex-col items-center justify-center p-6 transition-opacity duration-700">
     <div class="relative max-w-sm w-full text-center space-y-6">
       
-      <!-- Ruta corregida a assets/logo_intro.jpeg -->
       <div class="relative inline-block">
         <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500 via-amber-300 to-emerald-500 blur-lg opacity-40 animate-pulse"></div>
         <img src="assets/logo_intro.jpeg" alt="Cambalache Intro" class="relative rounded-full w-64 h-64 object-cover mx-auto gold-border">
@@ -80,7 +79,6 @@
   <!-- 2. HEADER Y CONTENIDO PRINCIPAL -->
   <header class="bg-gradient-to-b from-brand-card to-brand-dark border-b border-brand-gold/30 py-6 px-4 text-center">
     <div class="max-w-md mx-auto space-y-3">
-      <!-- Ruta corregida a assets/logo_header.jpeg -->
       <img src="assets/logo_header.jpeg" alt="Cambalache Logo Header" class="w-28 h-28 object-cover rounded-full mx-auto gold-border">
       <h1 class="text-xl font-bold text-brand-gold gold-text-glow tracking-wide">VERIFICACIÓN KYC</h1>
       <p class="text-xs text-slate-300">Completa tu solicitud e ingresa tus documentos de identidad</p>
@@ -304,16 +302,27 @@
         </div>
       </div>
 
-      <!-- PASO 7: Declaración y Firma -->
+      <!-- PASO 7: Declaración y Firma (CON MODAL PREVIO) -->
       <div id="step-7" class="step-content space-y-4">
         <h2 class="text-sm font-bold border-b border-brand-gold/20 pb-2 text-brand-gold">7. Declaración y Firma</h2>
         
-        <label class="flex items-start gap-2 text-xs text-slate-300">
-          <input type="checkbox" id="aceptacion" required class="mt-1 accent-brand-gold">
-          <span>Acepto la declaración y autorizo la verificación de mis datos.</span>
-        </label>
+        <!-- Bloque de Términos -->
+        <div class="p-4 bg-brand-input rounded-xl border border-slate-800 space-y-2">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="aceptacion" required disabled class="mt-1 w-4 h-4 accent-brand-gold cursor-not-allowed">
+            <label class="text-xs text-slate-300 leading-relaxed">
+              Acepto la declaración y autorizo la verificación de mis datos según los 
+              <button type="button" onclick="abrirModalTerminos()" class="text-brand-gold font-bold underline hover:text-amber-300">
+                Términos de Servicio y Privacidad de Naupar Inc.
+              </button>
+            </label>
+          </div>
+          <p id="mensajeFaltaLeer" class="text-[10px] text-amber-400/90 italic pl-7">
+            ⚠️ Debes hacer clic en los términos y leer el documento completo para activar la aceptación.
+          </p>
+        </div>
 
-        <div class="text-center">
+        <div class="text-center pt-2">
           <label class="block text-xs mb-2 text-slate-300">Firma digital *</label>
           <canvas id="signature-pad" width="300" height="150" class="bg-white rounded-xl border-2 border-brand-gold/50 touch-none mx-auto block"></canvas>
           <button type="button" id="clear-signature" class="text-xs text-brand-gold mt-2 underline inline-block">Limpiar firma</button>
@@ -337,6 +346,45 @@
     </div>
   </main>
 
+  <!-- 3. MODAL DE TÉRMINOS Y PRIVACIDAD NAUPAR INC. -->
+  <div id="modalTerminos" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-brand-card border gold-border rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[85vh]">
+      
+      <!-- Cabecera -->
+      <div class="p-4 border-b border-brand-gold/30 flex justify-between items-center bg-brand-dark rounded-t-2xl">
+        <h3 class="font-bold text-brand-gold text-sm">Términos de Servicio y Privacidad - Naupar Inc.</h3>
+        <button type="button" onclick="cerrarModalTerminos()" class="text-slate-400 hover:text-white font-bold text-xl">&times;</button>
+      </div>
+
+      <!-- Cuerpo con Scroll Obligatorio -->
+      <div id="cajaTextoTerminos" onscroll="verificarScrollTerminos()" class="p-5 overflow-y-auto space-y-4 text-xs text-slate-300 leading-relaxed">
+        <p class="font-bold text-slate-100 text-center uppercase tracking-wide border-b border-slate-800 pb-2">POLÍTICA DE PROTECCIÓN DE DATOS - NAUPAR INC.</p>
+        
+        <p><strong class="text-brand-gold">1. Propósito de la Recopilación:</strong> La información solicitada (documentos de identidad, datos biométricos y financieros) tiene como único propósito el cumplimiento normativo de "Conozca a su Cliente" (KYC) y Prevención de Lavado de Dinero (AML).</p>
+        
+        <p><strong class="text-brand-gold">2. Garantía Estricta de No Comercialización:</strong> <b>Naupar Inc. garantiza estrictamente que NO vende, alquila, transfiere ni comercializa</b> sus datos personales, financieros o biométricos a terceros con fines publicitarios, de marketing o comerciales bajo ninguna circunstancia.</p>
+        
+        <p><strong class="text-brand-gold">3. Seguridad del Estándar del Mercado:</strong> Sus archivos y datos sensibles son transferidos mediante conexiones cifradas HTTPS y almacenados en infraestructuras con cifrado de grado militar (Cloudflare R2). El acceso está estrictamente limitado al personal de auditoría autorizado de Naupar Inc.</p>
+        
+        <p><strong class="text-brand-gold">4. Veracidad de la Información:</strong> Al aceptar estos términos, declara bajo juramento que toda la información suministrada es veraz, exacta y pertenece a su persona o empresa representada.</p>
+        
+        <p><strong class="text-brand-gold">5. Retención y Derechos de Eliminación:</strong> Sus datos se conservarán únicamente durante el tiempo exigido por las regulaciones financieras aplicables. Puede solicitar la revisión de su expediente según los marcos legales vigentes.</p>
+        
+        <div class="h-8"></div>
+        <p class="text-center italic text-slate-500 text-[10px]">--- Fin del documento de protección de datos ---</p>
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="p-4 border-t border-slate-800 bg-brand-dark rounded-b-2xl">
+        <button type="button" id="btnAceptarContrato" disabled onclick="confirmarTerminos()" 
+                class="w-full py-3 rounded-xl font-bold text-xs transition duration-300 bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700">
+          Desliza hasta el final para aceptar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <script>
     // Temporizador ajustado a 5 segundos
     let timeLeft = 5;
@@ -359,7 +407,60 @@
       }
     }
 
-    // Lógica de Navegación
+    // Lógica del Modal de Términos y Scroll
+    let terminosLeidos = false;
+
+    function abrirModalTerminos() {
+      const modal = document.getElementById('modalTerminos');
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(verificarScrollTerminos, 200);
+      }
+    }
+
+    function cerrarModalTerminos() {
+      const modal = document.getElementById('modalTerminos');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function verificarScrollTerminos() {
+      if (terminosLeidos) return;
+
+      const caja = document.getElementById('cajaTextoTerminos');
+      const btn = document.getElementById('btnAceptarContrato');
+
+      if (caja && btn) {
+        // Tolerancia de 15px para detectar cuando el usuario toca fondo
+        if (caja.scrollHeight - caja.scrollTop <= caja.clientHeight + 15) {
+          terminosLeidos = true;
+          btn.disabled = false;
+          btn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed', 'border-slate-700');
+          btn.classList.add('bg-gradient-to-r', 'from-amber-500', 'to-amber-600', 'hover:from-amber-400', 'text-brand-dark', 'shadow-lg');
+          btn.innerText = '✅ Aceptar Términos y Condiciones';
+        }
+      }
+    }
+
+    function confirmarTerminos() {
+      if (!terminosLeidos) return;
+
+      const checkbox = document.getElementById('aceptacion');
+      const mensaje = document.getElementById('mensajeFaltaLeer');
+
+      if (checkbox) {
+        checkbox.disabled = false;
+        checkbox.checked = true;
+        checkbox.classList.remove('cursor-not-allowed');
+      }
+
+      if (mensaje) {
+        mensaje.classList.add('hidden');
+      }
+
+      cerrarModalTerminos();
+    }
+
+    // Lógica de Navegación Multi-paso
     let currentStep = 1;
     const totalSteps = 7;
     const titles = ["Datos personales", "Verificación de identidad", "Actividad Comercial", "Datos de Empresa", "Referencias", "Antecedentes", "Declaración y Firma"];
