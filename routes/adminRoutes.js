@@ -8,4 +8,7 @@ router.get('/solicitudes', adminController.obtenerSolicitudes);
 router.patch('/solicitudes/:id', adminController.cambiarEstado);
 router.delete('/solicitudes/:id', adminController.eliminarSolicitud);
 
+// Ruta proxy para servir archivos e imágenes de R2
+router.get('/media/*', adminController.obtenerMedia);
+
 module.exports = router;
