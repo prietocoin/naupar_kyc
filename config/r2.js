@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const r2Client = new S3Client({
   region: 'auto',
@@ -30,6 +30,18 @@ async function uploadToR2(fileBuffer, fileName, mimeType) {
 }
 
 /**
+ * Obtener objeto desde R2 (servidor proxy)
+ */
+async function getObjectFromR2(fileName) {
+  const command = new GetObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME,
+    Key: fileName,
+  });
+
+  return await r2Client.send(command);
+}
+
+/**
  * Eliminar archivo de Cloudflare R2
  */
 async function deleteFromR2(fileName) {
@@ -44,5 +56,6 @@ async function deleteFromR2(fileName) {
 module.exports = {
   r2Client,
   uploadToR2,
+  getObjectFromR2,
   deleteFromR2,
 };
