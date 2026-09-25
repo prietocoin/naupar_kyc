@@ -3,64 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Administración - KYC</title>
+  <title>Panel de Administración - KYC Cambalache</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#050B14',
+              card: '#0D192D',
+              input: '#07101E',
+              gold: '#D4AF37',
+              goldHover: '#F3C63F',
+              green: '#10B981',
+              red: '#EF4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gold-border {
+      border: 1px solid #D4AF37;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+    }
+    .gold-text-glow {
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-brand-dark text-slate-100 min-h-screen font-sans">
 
-  <!-- 1. Pantalla de Login Admin -->
+  <!-- 1. PANTALLA DE LOGIN -->
   <div id="login-view" class="flex items-center justify-center min-h-screen px-4">
-    <div class="bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl w-full max-w-md space-y-6">
-      <div class="text-center">
-        <h1 class="text-2xl font-bold text-amber-400">Panel Superusuario</h1>
-        <p class="text-xs text-slate-400 mt-1">Ingresa tus credenciales para gestionar el KYC</p>
+    <div class="bg-brand-card p-8 rounded-2xl gold-border max-w-md w-full space-y-6 shadow-2xl">
+      <div class="text-center space-y-2">
+        <h1 class="text-2xl font-extrabold text-brand-gold gold-text-glow">CAMBALACHE ADMIN</h1>
+        <p class="text-xs text-slate-400">Ingresa tus credenciales para gestionar solicitudes KYC</p>
       </div>
 
       <form id="login-form" class="space-y-4">
         <div>
-          <label class="block text-xs mb-1">Correo Electrónico</label>
-          <input type="email" id="admin-email" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-amber-400">
+          <label class="block text-xs mb-1 text-slate-300">Correo Electrónico</label>
+          <input type="email" id="admin-email" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs mb-1">Contraseña</label>
-          <input type="password" id="admin-pass" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-amber-400">
+          <label class="block text-xs mb-1 text-slate-300">Contraseña</label>
+          <input type="password" id="admin-pass" required class="w-full bg-brand-input border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:border-brand-gold focus:outline-none">
         </div>
-        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded text-sm transition">
+        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-brand-dark font-bold py-2.5 rounded-lg text-xs transition shadow-lg">
           Iniciar Sesión
         </button>
       </form>
     </div>
   </div>
 
-  <!-- 2. Dashboard de Administración -->
+  <!-- 2. DASHBOARD PRINCIPAL -->
   <div id="dashboard-view" class="hidden">
-    <!-- Navbar -->
-    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 flex justify-between items-center">
+    <header class="bg-gradient-to-r from-brand-card to-brand-dark border-b border-brand-gold/30 py-4 px-6 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <h1 class="text-xl font-bold text-amber-400">Gestión de Solicitudes KYC</h1>
-        <span id="badge-total" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0 registros</span>
+        <h1 class="text-lg font-bold text-brand-gold gold-text-glow">Panel de Verificación KYC</h1>
+        <span id="badge-total" class="bg-slate-800 text-brand-gold text-[10px] border border-brand-gold/40 px-2.5 py-0.5 rounded-full font-mono">0 registros</span>
       </div>
       <button id="btn-logout" class="text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
     </header>
 
     <main class="max-w-7xl mx-auto p-6">
-      <!-- Tabla de Solicitudes -->
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+      <div class="bg-brand-card rounded-2xl gold-border overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-900/80 text-amber-400 uppercase font-semibold border-b border-slate-700">
+            <thead class="bg-brand-dark text-brand-gold uppercase font-semibold border-b border-brand-gold/30">
               <tr>
-                <th class="p-3">#ID</th>
+                <th class="p-3 font-mono">#ID</th>
                 <th class="p-3">Cliente</th>
                 <th class="p-3">Documento</th>
                 <th class="p-3">WhatsApp</th>
-                <th class="p-3">Operación</th>
+                <th class="p-3">Tipo Operación</th>
                 <th class="p-3">Estado</th>
                 <th class="p-3 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody id="table-body" class="divide-y divide-slate-700/50">
-              <!-- Filas dinámicas -->
+            <tbody id="table-body" class="divide-y divide-slate-800">
+              <!-- Cargado dinámicamente -->
             </tbody>
           </table>
         </div>
@@ -68,22 +94,34 @@
     </main>
   </div>
 
-  <!-- 3. Modal de Detalle de Solicitud -->
-  <div id="modal-detail" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 space-y-6 text-xs">
-      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-        <h2 class="text-lg font-bold text-amber-400">Expediente de Verificación #<span id="modal-id"></span></h2>
-        <button id="close-modal" class="text-slate-400 hover:text-white text-lg">✕</button>
+  <!-- 3. MODAL DE EXPEDIENTE COMPLETO Y GALERÍA R2 -->
+  <div id="modal-detail" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div class="bg-brand-card border border-brand-gold/50 rounded-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-6 space-y-6 text-xs text-slate-200 shadow-2xl">
+      
+      <!-- Header Modal -->
+      <div class="flex justify-between items-center border-b border-brand-gold/30 pb-3">
+        <div>
+          <h2 class="text-base font-bold text-brand-gold">Expediente de Verificación #<span id="modal-id"></span></h2>
+          <p class="text-[10px] text-slate-400" id="modal-fecha"></p>
+        </div>
+        <button id="close-modal" class="text-slate-400 hover:text-white text-xl">✕</button>
       </div>
 
-      <div id="modal-content" class="space-y-4">
-        <!-- Detalle cargado por JS -->
+      <div id="modal-content" class="space-y-6">
+        <!-- Renderizado dinámico de datos y documentos R2 -->
       </div>
     </div>
   </div>
 
   <script>
-    const R2_PUBLIC_DOMAIN = ''; // Tu dominio R2 si lo usas directamente
+    // Dominio público R2 de Cloudflare
+    const R2_PUBLIC_DOMAIN = 'https://pub-49b9c87f6e6a418ba422de5ba36ddc73e.r2.dev';
+
+    function parseJSON(val) {
+      if (!val) return null;
+      if (typeof val === 'object') return val;
+      try { return JSON.parse(val); } catch (e) { return val; }
+    }
 
     // Login
     document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -110,20 +148,17 @@
       }
     });
 
-    // Mostrar Dashboard y Cargar Datos
     function showDashboard() {
       document.getElementById('login-view').classList.add('hidden');
       document.getElementById('dashboard-view').classList.remove('hidden');
       loadSolicitudes();
     }
 
-    // Logout
     document.getElementById('btn-logout').addEventListener('click', () => {
-      localStorage.removeItem('admin_logged');
+      localStorage.clear();
       location.reload();
     });
 
-    // Cargar solicitudes desde el Backend
     async function loadSolicitudes() {
       try {
         const res = await fetch('/api/admin/solicitudes');
@@ -137,26 +172,26 @@
 
         data.solicitudes.forEach(sol => {
           const badgeClass = sol.estado === 'aprobado' 
-            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' 
             : sol.estado === 'rechazado' 
-            ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' 
-            : 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+            ? 'bg-rose-500/20 text-rose-400 border-rose-500/40' 
+            : 'bg-amber-500/20 text-amber-400 border-amber-500/40';
 
           const row = document.createElement('tr');
-          row.className = 'hover:bg-slate-700/30 transition';
+          row.className = 'hover:bg-slate-800/60 transition';
           row.innerHTML = `
-            <td class="p-3 font-mono">#${sol.id}</td>
-            <td class="p-3 font-semibold text-slate-100">${sol.nombres} ${sol.apellidos}</td>
-            <td class="p-3">${sol.tipo_documento}: ${sol.numero_documento}</td>
+            <td class="p-3 font-mono text-brand-gold">#${sol.id}</td>
+            <td class="p-3 font-semibold text-slate-100">${sol.nombres || ''} ${sol.apellidos || ''}</td>
+            <td class="p-3">${sol.tipo_documento || '-'}: ${sol.numero_documento || '-'}</td>
             <td class="p-3">${sol.whatsapp_principal || '-'}</td>
-            <td class="p-3">${sol.tipo_operacion}</td>
+            <td class="p-3">${sol.tipo_operacion || '-'}</td>
             <td class="p-3">
-              <span class="px-2 py-0.5 border rounded-full text-[10px] uppercase font-bold ${badgeClass}">
+              <span class="px-2.5 py-0.5 border rounded-full text-[10px] uppercase font-bold ${badgeClass}">
                 ${sol.estado}
               </span>
             </td>
             <td class="p-3 text-right space-x-1">
-              <button onclick='viewDetail(${JSON.stringify(sol)})' class="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-amber-400">Ver</button>
+              <button onclick='viewDetail(${JSON.stringify(sol).replace(/'/g, "&apos;")})' class="px-2.5 py-1 bg-slate-800 border border-brand-gold/40 text-brand-gold rounded hover:bg-slate-700 transition">Ver Expediente</button>
               <button onclick="updateStatus(${sol.id}, 'aprobado')" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded">✓</button>
               <button onclick="updateStatus(${sol.id}, 'rechazado')" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded">✕</button>
               <button onclick="deleteSolicitud(${sol.id})" class="px-2 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded">🗑</button>
@@ -169,7 +204,6 @@
       }
     }
 
-    // Cambiar estado (Aprobar/Rechazar)
     async function updateStatus(id, estado) {
       if (!confirm(`¿Deseas cambiar el estado de la solicitud #${id} a '${estado.toUpperCase()}'?`)) return;
 
@@ -186,9 +220,8 @@
       }
     }
 
-    // Eliminar registro y archivos de R2
     async function deleteSolicitud(id) {
-      if (!confirm(`⚠️ ¿Deseas ELIMINAR PERMANENTEMENTE la solicitud #${id} y sus archivos en R2?`)) return;
+      if (!confirm(`⚠️ ¿Deseas ELIMINAR PERMANENTEMENTE la solicitud #${id} y todos sus archivos en R2?`)) return;
 
       try {
         const res = await fetch(`/api/admin/solicitudes/${id}`, { method: 'DELETE' });
@@ -199,37 +232,111 @@
       }
     }
 
-    // Modal de Detalle
+    // VISOR DE EXPEDIENTE COMPLETO
     function viewDetail(sol) {
       document.getElementById('modal-id').innerText = sol.id;
+      document.getElementById('modal-fecha').innerText = `Registrado el: ${sol.creado_en ? new Date(sol.creado_en).toLocaleString() : '-'}`;
+      
       const content = document.getElementById('modal-content');
 
+      const refs = parseJSON(sol.referencias) || [];
+      const ant = parseJSON(sol.antecedentes) || {};
+
+      const docs = [
+        { title: 'Doc Frente', key: sol.r2_doc_frente_key },
+        { title: 'Doc Dorso', key: sol.r2_doc_dorso_key },
+        { title: 'Selfie con Documento', key: sol.r2_doc_selfie_key },
+        { title: 'Comprobante Domicilio', key: sol.r2_doc_domicilio_key },
+        { title: 'Firma Digital', key: sol.r2_firma_key },
+        { title: 'Documento Empresa', key: sol.r2_doc_empresa_key }
+      ].filter(d => d.key);
+
       content.innerHTML = `
-        <div class="grid grid-cols-2 gap-4 bg-slate-900/50 p-3 rounded border border-slate-700">
-          <div><strong class="text-slate-400">Nacionalidad:</strong> ${sol.nacionalidad}</div>
-          <div><strong class="text-slate-400">F. Nacimiento:</strong> ${sol.fecha_nacimiento}</div>
-          <div><strong class="text-slate-400">Residencia:</strong> ${sol.ciudad_residencia}, ${sol.pais_residencia}</div>
-          <div><strong class="text-slate-400">Email:</strong> ${sol.email}</div>
-          <div class="col-span-2"><strong class="text-slate-400">Dirección:</strong> ${sol.direccion_actual}</div>
+        <!-- 1. DATOS PERSONALES -->
+        <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+          <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">1. Datos Personales</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div><span class="text-slate-400">Nombre Completo:</span> <span class="font-semibold text-slate-100">${sol.nombres || ''} ${sol.apellidos || ''}</span></div>
+            <div><span class="text-slate-400">Documento:</span> ${sol.tipo_documento || ''} - ${sol.numero_documento || ''}</div>
+            <div><span class="text-slate-400">Nacionalidad:</span> ${sol.nacionalidad || '-'}</div>
+            <div><span class="text-slate-400">Fecha Nacimiento:</span> ${sol.fecha_nacimiento ? sol.fecha_nacimiento.split('T')[0] : '-'}</div>
+            <div><span class="text-slate-400">Residencia:</span> ${sol.ciudad_residencia || ''}, ${sol.pais_residencia || ''}</div>
+            <div><span class="text-slate-400">Email:</span> <a href="mailto:${sol.email}" class="text-amber-400 underline">${sol.email || '-'}</a></div>
+            <div><span class="text-slate-400">WhatsApp Principal:</span> <a href="https://wa.me/${(sol.whatsapp_principal||'').replace(/[^0-9]/g,'')}" target="_blank" class="text-emerald-400 underline">${sol.whatsapp_principal || '-'}</a></div>
+            <div><span class="text-slate-400">WhatsApp Secundario:</span> ${sol.whatsapp_secundario || '-'}</div>
+            <div class="md:col-span-2"><span class="text-slate-400">Dirección Actual:</span> ${sol.direccion_actual || '-'}</div>
+            <div class="md:col-span-2"><span class="text-slate-400">Redes / Perfil Comercial:</span> ${sol.redes_sociales || '-'}</div>
+          </div>
         </div>
 
-        <h3 class="font-bold text-amber-400 mt-4">Documentos y Fotos R2</h3>
-        <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="p-2 border border-slate-700 rounded bg-slate-900">
-            <p class="text-[10px] text-slate-400 mb-1">Doc Frente</p>
-            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_doc_frente_key}</p>
+        <!-- 2. ACTIVIDAD COMERCIAL & EMPRESA -->
+        <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+          <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">2. Actividad Comercial y Empresa</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div><span class="text-slate-400">Tipo Operación:</span> ${sol.tipo_operacion || '-'}</div>
+            <div><span class="text-slate-400">Tiempo Experiencia:</span> ${sol.tiempo_experiencia || '-'}</div>
+            <div><span class="text-slate-400">Nombre Comercial:</span> ${sol.nombre_comercial || '-'}</div>
+            <div><span class="text-slate-400">Capital de Trabajo:</span> ${sol.capital_trabajo || '-'}</div>
+            <div><span class="text-slate-400">Volumen Diario:</span> ${sol.volumen_diario || '-'}</div>
+            <div><span class="text-slate-400">Razón Social Empresa:</span> ${sol.empresa_razon_social || '-'}</div>
+            <div><span class="text-slate-400">Registro Fiscal / RIF:</span> ${sol.empresa_registro_fiscal || '-'}</div>
           </div>
-          <div class="p-2 border border-slate-700 rounded bg-slate-900">
-            <p class="text-[10px] text-slate-400 mb-1">Doc Dorso</p>
-            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_doc_dorso_key}</p>
+        </div>
+
+        <!-- 3. REFERENCIAS Y ANTECEDENTES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">3. Referencias Comerciales</h3>
+            ${Array.isArray(refs) ? refs.map((r, i) => `
+              <div class="p-2 bg-brand-dark/50 rounded border border-slate-800">
+                <p class="font-semibold text-slate-200">Ref ${i+1}:${r.nombre || '-'}</p>
+                <p class="text-slate-400">WA: ${r.whatsapp || '-'}</p>
+              </div>
+            `).join('') : '<p class="text-slate-500">Sin referencias</p>'}
           </div>
-          <div class="p-2 border border-slate-700 rounded bg-slate-900">
-            <p class="text-[10px] text-slate-400 mb-1">Selfie</p>
-            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_doc_selfie_key}</p>
+
+          <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">4. Antecedentes Declarados</h3>
+            <div class="space-y-1">
+              <p><span class="text-slate-400">¿Reclamos/Disputas?:</span> <strong class="${ant.disputas === 'Sí' ? 'text-rose-400' : 'text-emerald-400'}">${ant.disputas || 'No'}</strong></p>
+              <p><span class="text-slate-400">¿Deudas Pendientes?:</span> <strong class="${ant.deudas === 'Sí' ? 'text-rose-400' : 'text-emerald-400'}">${ant.deudas || 'No'}</strong></p>
+            </div>
           </div>
-          <div class="p-2 border border-slate-700 rounded bg-slate-900">
-            <p class="text-[10px] text-slate-400 mb-1">Firma Key</p>
-            <p class="font-mono text-[9px] break-all text-amber-300">${sol.r2_firma_key}</p>
+        </div>
+
+        <!-- 4. GALERÍA DE ARCHIVOS Y DOCUMENTOS R2 -->
+        <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-3">
+          <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1 flex justify-between items-center">
+            <span>5. Documentos y Galería en Cloudflare R2</span>
+            <span class="text-[10px] text-slate-400 font-mono">${docs.length} archivos subidos</span>
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            ${docs.map(doc => {
+              const fullUrl = `${R2_PUBLIC_DOMAIN}/${doc.key}`;
+              const isPdf = doc.key.endsWith('.pdf');
+
+              return `
+                <div class="bg-brand-dark p-3 rounded-xl border border-slate-700/80 flex flex-col items-center justify-between space-y-2 text-center group hover:border-brand-gold/50 transition">
+                  <span class="font-semibold text-brand-gold text-[11px]">${doc.title}</span>${isPdf ? `
+                    <div class="w-full h-32 flex items-center justify-center bg-slate-900 rounded border border-slate-800 text-rose-400 text-3xl">
+                      📄 PDF
+                    </div>
+                  ` : `
+                    <div class="w-full h-32 overflow-hidden rounded border border-slate-800 bg-black flex items-center justify-center">
+                      <img src="${fullUrl}" alt="${doc.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Error+Carga';">
+                    </div>
+                  `}
+
+                  <div class="w-full space-y-1">
+                    <a href="${fullUrl}" target="_blank" class="block w-full py-1.5 bg-brand-card hover:bg-slate-700 text-brand-gold text-[10px] rounded border border-brand-gold/30 font-semibold transition">
+                      Abrir archivo ↗
+                    </a>
+                    <p class="font-mono text-[8px] text-slate-500 truncate" title="${doc.key}">${doc.key}</p>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -241,7 +348,6 @@
       document.getElementById('modal-detail').classList.add('hidden');
     });
 
-    // Auto-login si ya inició sesión
     if (localStorage.getItem('admin_logged') === 'true') {
       showDashboard();
     }
