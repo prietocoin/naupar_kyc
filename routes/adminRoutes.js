@@ -11,4 +11,7 @@ router.delete('/solicitudes/:id', adminController.eliminarSolicitud);
 // Ruta proxy autenticada para servir multimedia de R2
 router.get('/media/*', adminController.obtenerMedia);
 
+// Ruta para guardar suscripción a Web Push Notifications
+router.post('/push-subscribe', adminController.suscribirPush);
+
 module.exports = router;
