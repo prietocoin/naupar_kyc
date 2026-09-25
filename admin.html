@@ -107,7 +107,7 @@
     </main>
   </div>
 
-  <!-- 3. MODAL EXPEDIENTE REACTIVO -->
+  <!-- 3. MODAL DE EXPEDIENTE COMPLETO AUDITABLE -->
   <div x-show="modalAbierto" x-cloak class="fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <div class="bg-brand-card border border-brand-gold/50 rounded-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-6 space-y-6 text-xs text-slate-200 shadow-2xl" @click.away="modalAbierto = false">
       
@@ -122,22 +122,80 @@
       <template x-if="solicitudSeleccionada">
         <div class="space-y-6">
           
-          <!-- DATOS PERSONALES -->
+          <!-- SECCIÓN 1: DATOS PERSONALES -->
           <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
             <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">1. Datos Personales</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div><span class="text-slate-400">Nombre Completo:</span> <span class="font-semibold text-slate-100" x-text="solicitudSeleccionada.nombres + ' ' + solicitudSeleccionada.apellidos"></span></div>
-              <div><span class="text-slate-400">Documento:</span> <span x-text="solicitudSeleccionada.tipo_documento + ' - ' + solicitudSeleccionada.numero_documento"></span></div>
-              <div><span class="text-slate-400">Email:</span> <span class="text-amber-400" x-text="solicitudSeleccionada.email"></span></div>
-              <div><span class="text-slate-400">WhatsApp:</span> <span class="text-emerald-400" x-text="solicitudSeleccionada.whatsapp_principal"></span></div>
+              <div><span class="text-slate-400">Nombre Completo:</span> <span class="font-semibold text-slate-100" x-text="(solicitudSeleccionada.nombres || '') + ' ' + (solicitudSeleccionada.apellidos || '')"></span></div>
+              <div><span class="text-slate-400">Documento:</span> <span x-text="(solicitudSeleccionada.tipo_documento || '') + ' - ' + (solicitudSeleccionada.numero_documento || '')"></span></div>
+              <div><span class="text-slate-400">Nacionalidad:</span> <span x-text="solicitudSeleccionada.nacionalidad || '-'"></span></div>
+              <div><span class="text-slate-400">Fecha Nacimiento:</span> <span x-text="formatOnlyDate(solicitudSeleccionada.fecha_nacimiento)"></span></div>
+              <div><span class="text-slate-400">Residencia:</span> <span x-text="(solicitudSeleccionada.ciudad_residencia || '') + ', ' + (solicitudSeleccionada.pais_residencia || '')"></span></div>
+              <div><span class="text-slate-400">Email:</span> <a :href="'mailto:' + solicitudSeleccionada.email" class="text-amber-400 underline" x-text="solicitudSeleccionada.email || '-'"></a></div>
+              <div><span class="text-slate-400">WhatsApp Principal:</span> <a :href="'https://wa.me/' + cleanPhone(solicitudSeleccionada.whatsapp_principal)" target="_blank" class="text-emerald-400 underline" x-text="solicitudSeleccionada.whatsapp_principal || '-'"></a></div>
+              <div><span class="text-slate-400">WhatsApp Secundario:</span> <span x-text="solicitudSeleccionada.whatsapp_secundario || '-'"></span></div>
+              <div class="md:col-span-2"><span class="text-slate-400">Dirección Actual:</span> <span x-text="solicitudSeleccionada.direccion_actual || '-'"></span></div>
+              <div class="md:col-span-2"><span class="text-slate-400">Redes / Perfil Comercial:</span> <span x-text="solicitudSeleccionada.redes_sociales || '-'"></span></div>
             </div>
           </div>
 
-          <!-- GALERÍA R2 DIRECTA CON FALLBACK SVG -->
+          <!-- SECCIÓN 2: ACTIVIDAD COMERCIAL & EMPRESA -->
+          <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">2. Actividad Comercial y Empresa</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div><span class="text-slate-400">Tipo Operación:</span> <span x-text="solicitudSeleccionada.tipo_operacion || '-'"></span></div>
+              <div><span class="text-slate-400">Tiempo Experiencia:</span> <span x-text="solicitudSeleccionada.tiempo_experiencia || '-'"></span></div>
+              <div><span class="text-slate-400">Nombre Comercial:</span> <span x-text="solicitudSeleccionada.nombre_comercial || '-'"></span></div>
+              <div><span class="text-slate-400">Capital de Trabajo:</span> <span x-text="solicitudSeleccionada.capital_trabajo || '-'"></span></div>
+              <div><span class="text-slate-400">Volumen Diario:</span> <span x-text="solicitudSeleccionada.volumen_diario || '-'"></span></div>
+              <div><span class="text-slate-400">Razón Social Empresa:</span> <span x-text="solicitudSeleccionada.empresa_razon_social || '-'"></span></div>
+              <div><span class="text-slate-400">Registro Fiscal / RIF:</span> <span x-text="solicitudSeleccionada.empresa_registro_fiscal || '-'"></span></div>
+              <div><span class="text-slate-400">País Constitución:</span> <span x-text="solicitudSeleccionada.empresa_pais_constitucion || '-'"></span></div>
+              <div class="md:col-span-2"><span class="text-slate-400">Actividad de Empresa:</span> <span x-text="solicitudSeleccionada.empresa_actividad || '-'"></span></div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 3 Y 4: REFERENCIAS Y ANTECEDENTES -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- REFERENCIAS COMERCIALES -->
+            <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+              <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">3. Referencias Comerciales</h3>
+              <div class="space-y-1.5">
+                <template x-for="(r, idx) in parseJSON(solicitudSeleccionada.referencias)" :key="idx">
+                  <div class="p-2 bg-brand-dark/50 rounded border border-slate-800">
+                    <p class="font-semibold text-slate-200" x-text="'Ref ' + (idx + 1) + ': ' + (r.nombre || '-')"></p>
+                    <p class="text-slate-400" x-text="'WA: ' + (r.whatsapp || '-')"></p>
+                  </div>
+                </template>
+                <template x-if="!parseJSON(solicitudSeleccionada.referencias)?.length">
+                  <p class="text-slate-500">Sin referencias registradas</p>
+                </template>
+              </div>
+            </div>
+
+            <!-- ANTECEDENTES DECLARADOS -->
+            <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
+              <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">4. Antecedentes Declarados</h3>
+              <div class="space-y-1.5 text-xs">
+                <p>
+                  <span class="text-slate-400">¿Reclamos/Disputas?:</span> 
+                  <strong :class="parseJSON(solicitudSeleccionada.antecedentes)?.disputas === 'Sí' ? 'text-rose-400' : 'text-emerald-400'" 
+                          x-text="parseJSON(solicitudSeleccionada.antecedentes)?.disputas || 'No'"></strong>
+                </p>
+                <p>
+                  <span class="text-slate-400">¿Deudas Pendientes?:</span> 
+                  <strong :class="parseJSON(solicitudSeleccionada.antecedentes)?.deudas === 'Sí' ? 'text-rose-400' : 'text-emerald-400'" 
+                          x-text="parseJSON(solicitudSeleccionada.antecedentes)?.deudas || 'No'"></strong>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 5: GALERÍA Y DOCUMENTOS CLOUDFLARE R2 -->
           <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-3">
             <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1 flex justify-between items-center">
-              <span>2. Documentos y Galería en Cloudflare R2</span>
-              <span class="text-[10px] text-slate-400 font-mono" x-text="obtenerDocsValidos(solicitudSeleccionada).length + ' archivos'"></span>
+              <span>5. Documentos y Galería en Cloudflare R2</span>
+              <span class="text-[10px] text-slate-400 font-mono" x-text="obtenerDocsValidos(solicitudSeleccionada).length + ' archivos subidos'"></span>
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -186,6 +244,8 @@
         solicitudes: [],
         solicitudSeleccionada: null,
         modalAbierto: false,
+        
+        // Reemplazar por tu Custom Domain de R2 si lo activaste en Cloudflare (ej: 'https://media.jairokov.com')
         R2_PUBLIC_DOMAIN: 'https://pub-49b9c87f6e6a418ba422de5ba36ddc73e.r2.dev',
 
         init() {
@@ -193,6 +253,17 @@
             this.isLogged = true;
             this.loadSolicitudes();
           }
+        },
+
+        parseJSON(val) {
+          if (!val) return [];
+          if (typeof val === 'object') return val;
+          try { return JSON.parse(val); } catch (e) { return []; }
+        },
+
+        cleanPhone(phone) {
+          if (!phone) return '';
+          return String(phone).replace(/[^0-9]/g, '');
         },
 
         async login() {
@@ -258,6 +329,11 @@
         formatFecha(fecha) {
           if (!fecha) return '-';
           return new Date(fecha).toLocaleString();
+        },
+
+        formatOnlyDate(fecha) {
+          if (!fecha) return '-';
+          return String(fecha).split('T')[0];
         },
 
         async updateStatus(id, estado) {
