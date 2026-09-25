@@ -1,5 +1,13 @@
 const db = require('../config/db');
 const { deleteFromR2, getObjectFromR2 } = require('../config/r2');
+const webpush = require('web-push');
+
+// Configuración inicial de Web Push con llaves VAPID
+webpush.setVapidDetails(
+  process.env.VAPID_MAIL || 'mailto:admin@jairokov.com',
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
 
 // 1. Autenticación simple del Superusuario
 exports.login = async (req, res) => {
@@ -157,5 +165,68 @@ exports.obtenerMedia = async (req, res) => {
   } catch (error) {
     console.error('Error al servir media desde R2:', error.message);
     return res.status(404).send('Archivo no encontrado');
+  }
+};
+
+// 6. Registrar suscripción Push del navegador admin
+exports.suscribirPush = async (req, res) => {
+  try {
+    const subscription = req.body;
+    if (!subscription || !subscription.endpoint) {
+      return res.status(400).json({ error: 'Suscripción inválida' });
+    }
+
+    // Auto-creación de tabla si no existe
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id SERIAL PRIMARY KEY,
+        endpoint TEXT UNIQUE NOT NULL,
+        keys JSONB NOT NULL,
+        creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await db.query(
+      `INSERT INTO push_subscriptions (endpoint, keys) 
+       VALUES ($1, $2) 
+       ON CONFLICT (endpoint) DO UPDATE SET keys = $2`,
+      [subscription.endpoint, JSON.stringify(subscription.keys)]
+    );
+
+    res.status(201).json({ success: true, message: 'Navegador suscrito a notificaciones push' });
+  } catch (error) {
+    console.error('Error al guardar suscripción push:', error);
+    res.status(500).json({ error: 'Error interno en el servidor' });
+  }
+};
+
+// 7. Disparar notificación push flotante a administradores
+exports.notificarNuevoKYC = async (datosCliente) => {
+  try {
+    const result = await db.query('SELECT endpoint, keys FROM push_subscriptions');
+    if (!result.rows || result.rows.length === 0) return;
+
+    const payload = JSON.stringify({
+      title: '🚨 NUEVO KYC REGISTRADO',
+      body: `Cliente: ${datosCliente.nombres || ''} ${datosCliente.apellidos || ''} (${datosCliente.numero_documento || ''})`,
+      url: '/admin.html'
+    });
+
+    const envios = result.rows.map(sub => {
+      const pushSubscription = {
+        endpoint: sub.endpoint,
+        keys: typeof sub.keys === 'string' ? JSON.parse(sub.keys) : sub.keys
+      };
+      
+      return webpush.sendNotification(pushSubscription, payload).catch(async (err) => {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          await db.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [sub.endpoint]);
+        }
+      });
+    });
+
+    await Promise.all(envios);
+  } catch (error) {
+    console.error('Error enviando notificación push:', error);
   }
 };
