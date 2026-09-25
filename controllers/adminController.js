@@ -129,16 +129,33 @@ exports.eliminarSolicitud = async (req, res) => {
 // 5. Servir archivos multimedia de R2 mediante proxy seguro
 exports.obtenerMedia = async (req, res) => {
   try {
-    const key = req.params[0];
+    let key = req.params[0];
     if (!key) return res.status(400).send('Key no especificada');
+
+    // Limpieza estricta: Elimina barras inclinadas sobrantes al inicio de la clave
+    key = key.replace(/^\/+/, '');
 
     const objectData = await getObjectFromR2(key);
 
-    res.setHeader('Content-Type', objectData.ContentType || 'image/jpeg');
+    // Detección dinámica de Content-Type
+    let contentType = objectData.ContentType;
+    if (!contentType || contentType === 'application/octet-stream') {
+      if (key.endsWith('.pdf')) contentType = 'application/pdf';
+      else if (key.endsWith('.png')) contentType = 'image/png';
+      else if (key.endsWith('.webp')) contentType = 'image/webp';
+      else contentType = 'image/jpeg';
+    }
+
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Cache-Control', 'public, max-age=86400');
-    objectData.Body.pipe(res);
+
+    // Procesamiento seguro del cuerpo de datos de AWS SDK v3 a Buffer
+    const byteArray = await objectData.Body.transformToByteArray();
+    const buffer = Buffer.from(byteArray);
+
+    return res.send(buffer);
   } catch (error) {
-    console.error('Error al servir media desde R2:', error);
-    res.status(404).send('Archivo no encontrado');
+    console.error('Error al servir media desde R2:', error.message);
+    return res.status(404).send('Archivo no encontrado');
   }
 };
