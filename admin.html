@@ -61,7 +61,17 @@
         <h1 class="text-lg font-bold text-brand-gold">Panel de Verificación KYC</h1>
         <span class="bg-slate-800 text-brand-gold text-[10px] border border-brand-gold/40 px-2.5 py-0.5 rounded-full font-mono" x-text="solicitudes.length + ' registros'"></span>
       </div>
-      <button @click="logout()" class="text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
+
+      <div class="flex items-center gap-4">
+        <!-- BOTÓN DE NOTIFICACIONES PUSH NATIVAS -->
+        <button @click="solicitarPermisoNotificaciones()" 
+                class="px-3 py-1.5 border rounded-lg text-xs font-bold transition flex items-center gap-1.5"
+                :class="pushActivado ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'">
+          <span x-text="pushActivado ? '🔔 Notificaciones Activas' : '🔕 Activar Push Admin'"></span>
+        </button>
+
+        <button @click="logout()" class="text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
+      </div>
     </header>
 
     <main class="max-w-7xl mx-auto p-6 flex-1 w-full">
@@ -157,7 +167,6 @@
 
           <!-- SECCIÓN 3 Y 4: REFERENCIAS Y ANTECEDENTES -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- REFERENCIAS COMERCIALES -->
             <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
               <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">3. Referencias Comerciales</h3>
               <div class="space-y-1.5">
@@ -173,7 +182,6 @@
               </div>
             </div>
 
-            <!-- ANTECEDENTES DECLARADOS -->
             <div class="bg-brand-input p-4 rounded-xl border border-slate-800 space-y-2">
               <h3 class="font-bold text-brand-gold border-b border-brand-gold/20 pb-1">4. Antecedentes Declarados</h3>
               <div class="space-y-1.5 text-xs">
@@ -244,11 +252,68 @@
         solicitudes: [],
         solicitudSeleccionada: null,
         modalAbierto: false,
+        pushActivado: false,
+
+        // Clave pública VAPID asignada
+        VAPID_PUBLIC_KEY: 'BBfdTGLb2BkHbpN98N3c1xQGQKHaote0e1VyY2pGEw-o5E8kXM96tah3Xyk2BCQn9ZvMWqc4ex_S6zvLdOjAK6Q',
 
         init() {
           if (localStorage.getItem('admin_logged') === 'true') {
             this.isLogged = true;
             this.loadSolicitudes();
+            this.verificarEstadoPush();
+          }
+        },
+
+        async verificarEstadoPush() {
+          if ('serviceWorker' in navigator && 'PushManager' in window) {
+            try {
+              const reg = await navigator.serviceWorker.register('/sw.js');
+              const sub = await reg.pushManager.getSubscription();
+              if (sub) this.pushActivado = true;
+            } catch (err) {
+              console.error('Error registrando Service Worker:', err);
+            }
+          }
+        },
+
+        async solicitarPermisoNotificaciones() {
+          try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+              alert('Permiso de notificaciones denegado en el navegador.');
+              return;
+            }
+
+            const reg = await navigator.serviceWorker.ready;
+            let sub = await reg.pushManager.getSubscription();
+
+            if (!sub) {
+              const padding = '='.repeat((4 - this.VAPID_PUBLIC_KEY.length % 4) % 4);
+              const base64 = (this.VAPID_PUBLIC_KEY + padding).replace(/\-/g, '+').replace(/_/g, '/');
+              const rawData = window.atob(base64);
+              const outputArray = new Uint8Array(rawData.length);
+              for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+              }
+
+              sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: outputArray
+              });
+            }
+
+            await fetch('/api/admin/push-subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sub)
+            });
+
+            this.pushActivado = true;
+            alert('✅ Notificaciones Push activadas correctamente en este dispositivo.');
+          } catch (err) {
+            console.error('Error activando notificaciones push:', err);
+            alert('Error al activar notificaciones push.');
           }
         },
 
@@ -275,6 +340,7 @@
               localStorage.setItem('admin_logged', 'true');
               this.isLogged = true;
               this.loadSolicitudes();
+              this.verificarEstadoPush();
             } else {
               alert('Error: ' + data.error);
             }
@@ -305,7 +371,6 @@
           this.modalAbierto = true;
         },
 
-        // PROXY AUTENTICADO (Mismo comportamiento que Remithub)
         getPublicUrl(key) {
           if (!key) return '';
           const cleanKey = String(key).replace(/^\/+/, '');
