@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { deleteFromR2 } = require('../config/r2');
+const { deleteFromR2, getObjectFromR2 } = require('../config/r2');
 
 // 1. Autenticación simple del Superusuario
 exports.login = async (req, res) => {
@@ -17,7 +17,7 @@ exports.login = async (req, res) => {
 
     const admin = result.rows[0];
 
-    // Verificación de contraseña (ajusta según tu hash o comparación)
+    // Verificación de contraseña
     if (admin.password_hash !== password) {
       return res.status(401).json({ success: false, error: 'Credenciales inválidas' });
     }
@@ -109,7 +109,7 @@ exports.eliminarSolicitud = async (req, res) => {
       row.r2_doc_empresa_key,
       row.r2_firma_key,
       row.r2_pdf_expediente_key
-    ].filter(Boolean); // Filtra valores null o undefined
+    ].filter(Boolean);
 
     await Promise.all(keysAEliminar.map(key => deleteFromR2(key)));
 
@@ -123,5 +123,22 @@ exports.eliminarSolicitud = async (req, res) => {
   } catch (error) {
     console.error('Error al eliminar solicitud:', error);
     res.status(500).json({ success: false, error: 'Error al eliminar el registro' });
+  }
+};
+
+// 5. Servir archivos multimedia de R2 mediante proxy seguro
+exports.obtenerMedia = async (req, res) => {
+  try {
+    const key = req.params[0];
+    if (!key) return res.status(400).send('Key no especificada');
+
+    const objectData = await getObjectFromR2(key);
+
+    res.setHeader('Content-Type', objectData.ContentType || 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    objectData.Body.pipe(res);
+  } catch (error) {
+    console.error('Error al servir media desde R2:', error);
+    res.status(404).send('Archivo no encontrado');
   }
 };
