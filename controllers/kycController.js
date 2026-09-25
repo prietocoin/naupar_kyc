@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { uploadToR2 } = require('../config/r2');
+const { notificarNuevoKYC } = require('./adminController');
 
 exports.registrarKYC = async (req, res) => {
   try {
@@ -54,6 +55,13 @@ exports.registrarKYC = async (req, res) => {
     ];
 
     const result = await db.query(query, values);
+
+    // 4. Disparar notificación Web Push al panel administrador en segundo plano
+    notificarNuevoKYC({
+      nombres: body.nombres,
+      apellidos: body.apellidos,
+      numero_documento: body.numero_documento
+    }).catch(err => console.error('Error enviando push:', err));
 
     res.status(201).json({
       success: true,
