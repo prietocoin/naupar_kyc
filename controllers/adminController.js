@@ -3,11 +3,17 @@ const { deleteFromR2, getObjectFromR2 } = require('../config/r2');
 const webpush = require('web-push');
 
 // Configuración inicial de Web Push con llaves VAPID
-webpush.setVapidDetails(
-  process.env.VAPID_MAIL || 'mailto:admin@jairokov.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+try {
+  if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      process.env.VAPID_MAIL || 'mailto:admin@jairokov.com',
+      process.env.VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+  }
+} catch (e) {
+  console.error('Error al configurar WebPush:', e.message);
+}
 
 // 1. Autenticación simple del Superusuario
 exports.login = async (req, res) => {
@@ -25,7 +31,6 @@ exports.login = async (req, res) => {
 
     const admin = result.rows[0];
 
-    // Verificación de contraseña
     if (admin.password_hash !== password) {
       return res.status(401).json({ success: false, error: 'Credenciales inválidas' });
     }
@@ -63,7 +68,7 @@ exports.obtenerSolicitudes = async (req, res) => {
 exports.cambiarEstado = async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado } = req.body; // 'aprobado' | 'rechazado' | 'pendiente'
+    const { estado } = req.body;
 
     if (!['aprobado', 'rechazado', 'pendiente'].includes(estado)) {
       return res.status(400).json({ success: false, error: 'Estado no válido' });
@@ -94,7 +99,6 @@ exports.eliminarSolicitud = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Obtener las keys de R2 asociadas a este registro antes de borrarlo
     const result = await db.query(
       `SELECT r2_doc_frente_key, r2_doc_dorso_key, r2_doc_selfie_key, 
               r2_doc_domicilio_key, r2_doc_empresa_key, r2_firma_key, r2_pdf_expediente_key 
@@ -108,7 +112,6 @@ exports.eliminarSolicitud = async (req, res) => {
 
     const row = result.rows[0];
 
-    // Eliminar todos los archivos adjuntos en Cloudflare R2
     const keysAEliminar = [
       row.r2_doc_frente_key,
       row.r2_doc_dorso_key,
@@ -121,7 +124,6 @@ exports.eliminarSolicitud = async (req, res) => {
 
     await Promise.all(keysAEliminar.map(key => deleteFromR2(key)));
 
-    // Eliminar la fila en PostgreSQL
     await db.query('DELETE FROM solicitudes_kyc WHERE id = $1', [id]);
 
     res.json({
@@ -140,12 +142,10 @@ exports.obtenerMedia = async (req, res) => {
     let key = req.params[0];
     if (!key) return res.status(400).send('Key no especificada');
 
-    // Limpieza estricta: Elimina barras inclinadas sobrantes al inicio de la clave
     key = key.replace(/^\/+/, '');
 
     const objectData = await getObjectFromR2(key);
 
-    // Detección dinámica de Content-Type
     let contentType = objectData.ContentType;
     if (!contentType || contentType === 'application/octet-stream') {
       if (key.endsWith('.pdf')) contentType = 'application/pdf';
@@ -157,7 +157,6 @@ exports.obtenerMedia = async (req, res) => {
     res.setHeader('Content-Type', contentType);
     res.setHeader('Cache-Control', 'public, max-age=86400');
 
-    // Procesamiento seguro del cuerpo de datos de AWS SDK v3 a Buffer
     const byteArray = await objectData.Body.transformToByteArray();
     const buffer = Buffer.from(byteArray);
 
@@ -176,7 +175,6 @@ exports.suscribirPush = async (req, res) => {
       return res.status(400).json({ error: 'Suscripción inválida' });
     }
 
-    // Auto-creación de tabla si no existe
     await db.query(`
       CREATE TABLE IF NOT EXISTS push_subscriptions (
         id SERIAL PRIMARY KEY,
